@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import * as Crypto from 'expo-crypto';
-import type { Alert, AlertStatus, Machine } from '../types';
+import type { Alert, AlertStatus } from '../types';
 import { getAlerts, createAlert as dbCreateAlert, updateAlert as dbUpdateAlert } from '../database';
 import { useAuthStore } from './authStore';
 import { useMachineStore } from './machineStore';
+
+const TENANT_ID = 'tenant_demo';
 
 interface AlertState {
   alerts: Alert[];
@@ -117,6 +119,7 @@ export const useAlertStore = create<AlertState>((set, get) => ({
 
     const alert: Omit<Alert, 'synced'> = {
       id: Crypto.randomUUID(),
+      tenantId: TENANT_ID,
       machineId: machine.id,
       machineName: machine.name,
       message,

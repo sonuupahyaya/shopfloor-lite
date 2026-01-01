@@ -60,6 +60,7 @@ CREATE TABLE IF NOT EXISTS maintenance_items (
 -- Alerts table
 CREATE TABLE IF NOT EXISTS alerts (
   id TEXT PRIMARY KEY,
+  tenant_id TEXT NOT NULL,
   machine_id TEXT NOT NULL,
   machine_name TEXT NOT NULL,
   message TEXT NOT NULL,

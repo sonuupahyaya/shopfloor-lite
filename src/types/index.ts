@@ -61,6 +61,7 @@ export type AlertStatus = 'created' | 'acknowledged' | 'cleared';
 
 export interface Alert {
   id: string;
+  tenantId: string;
   machineId: string;
   machineName: string;
   message: string;

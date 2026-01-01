@@ -10,11 +10,15 @@ import type {
 } from '../types';
 
 let db: SQLite.SQLiteDatabase | null = null;
+let initPromise: Promise<void> | null = null;
 
 export async function getDatabase(): Promise<SQLite.SQLiteDatabase> {
   if (!db) {
     db = await SQLite.openDatabaseAsync(DATABASE_NAME);
-    await initializeDatabase();
+    if (!initPromise) {
+      initPromise = initializeDatabase();
+    }
+    await initPromise;
   }
   return db;
 }
@@ -29,10 +33,28 @@ async function initializeDatabase(): Promise<void> {
     }
   }
 
+  // Run migrations for existing databases
+  await runMigrations();
+
   const machines = await db.getAllAsync<{ id: string }>('SELECT id FROM machines LIMIT 1');
   if (machines.length === 0) {
     await db.execAsync(SEED_MACHINES_SQL);
     await db.execAsync(SEED_MAINTENANCE_SQL);
+  }
+}
+
+async function runMigrations(): Promise<void> {
+  if (!db) return;
+
+  // Check if tenant_id column exists in alerts table
+  const alertColumns = await db.getAllAsync<{ name: string }>(
+    `PRAGMA table_info(alerts)`
+  );
+  const hasTenantId = alertColumns.some((col) => col.name === 'tenant_id');
+
+  if (!hasTenantId) {
+    console.log('[Database] Running migration: adding tenant_id to alerts');
+    await db.execAsync(`ALTER TABLE alerts ADD COLUMN tenant_id TEXT DEFAULT 'tenant_demo'`);
   }
 }
 
@@ -116,6 +138,14 @@ export async function updateDowntimeEvent(
   if (updates.reasonLabel !== undefined) {
     fields.push('reason_label = ?');
     values.push(updates.reasonLabel);
+  }
+  if (updates.parentReasonCode !== undefined) {
+    fields.push('parent_reason_code = ?');
+    values.push(updates.parentReasonCode);
+  }
+  if (updates.parentReasonLabel !== undefined) {
+    fields.push('parent_reason_label = ?');
+    values.push(updates.parentReasonLabel);
   }
   if (updates.photoPath !== undefined) {
     fields.push('photo_path = ?');
@@ -327,6 +357,7 @@ export async function getAlerts(status?: Alert['status']): Promise<Alert[]> {
 
   const rows = await database.getAllAsync<{
     id: string;
+    tenant_id: string;
     machine_id: string;
     machine_name: string;
     message: string;
@@ -342,6 +373,7 @@ export async function getAlerts(status?: Alert['status']): Promise<Alert[]> {
 
   return rows.map((row) => ({
     id: row.id,
+    tenantId: row.tenant_id,
     machineId: row.machine_id,
     machineName: row.machine_name,
     message: row.message,
@@ -361,11 +393,12 @@ export async function createAlert(alert: Omit<Alert, 'synced'>): Promise<string>
 
   await database.runAsync(
     `INSERT INTO alerts (
-      id, machine_id, machine_name, message, severity, status,
+      id, tenant_id, machine_id, machine_name, message, severity, status,
       created_at, acknowledged_by, acknowledged_at, cleared_by, cleared_at, synced
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
     [
       alert.id,
+      alert.tenantId,
       alert.machineId,
       alert.machineName,
       alert.message,

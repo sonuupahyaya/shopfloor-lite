@@ -14,6 +14,7 @@ export default function TabsLayout() {
 
   return (
     <View style={{ flex: 1 }}>
+      <SyncStatusBar />
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -87,7 +88,6 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-      <SyncStatusBar />
     </View>
   );
 }

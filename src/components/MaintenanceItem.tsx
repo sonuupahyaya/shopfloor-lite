@@ -24,7 +24,9 @@ export function MaintenanceItemCard({
   onAddNote,
 }: MaintenanceItemProps) {
   const [showNoteModal, setShowNoteModal] = useState(false);
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [noteText, setNoteText] = useState(item.notes ?? '');
+  const [completionNote, setCompletionNote] = useState('');
 
   const getStatusColor = () => {
     switch (item.status) {
@@ -57,6 +59,18 @@ export function MaintenanceItemCard({
       onAddNote(noteText.trim());
     }
     setShowNoteModal(false);
+  };
+
+  const handleMarkDone = () => {
+    setShowCompletionModal(true);
+  };
+
+  const handleConfirmCompletion = () => {
+    if (completionNote.trim()) {
+      onMarkDone(completionNote.trim());
+      setShowCompletionModal(false);
+      setCompletionNote('');
+    }
   };
 
   return (
@@ -119,7 +133,7 @@ export function MaintenanceItemCard({
 
             <TouchableOpacity
               style={[styles.actionButton, styles.doneButton]}
-              onPress={() => onMarkDone()}
+              onPress={handleMarkDone}
             >
               <Icon name="checkmark" size={16} color={colors.textOnPrimary} />
               <Text style={styles.doneButtonText}>Mark Done</Text>
@@ -161,6 +175,57 @@ export function MaintenanceItemCard({
                 onPress={handleSaveNote}
               >
                 <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={showCompletionModal}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setShowCompletionModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Complete Maintenance Task</Text>
+            <Text style={styles.modalSubtitle}>
+              A note is required to mark this task as done.
+            </Text>
+
+            <TextInput
+              style={styles.noteInput}
+              value={completionNote}
+              onChangeText={setCompletionNote}
+              placeholder="Enter completion note (required)..."
+              placeholderTextColor={colors.textMuted}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowCompletionModal(false);
+                  setCompletionNote('');
+                }}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.modalButton,
+                  styles.saveButton,
+                  !completionNote.trim() && styles.disabledButton,
+                ]}
+                onPress={handleConfirmCompletion}
+                disabled={!completionNote.trim()}
+              >
+                <Text style={styles.saveButtonText}>Complete</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -334,5 +399,14 @@ const styles = StyleSheet.create({
     fontSize: fontSize.md,
     fontWeight: '600',
     color: colors.textOnPrimary,
+  },
+  modalSubtitle: {
+    fontSize: fontSize.sm,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
+  },
+  disabledButton: {
+    backgroundColor: colors.border,
+    opacity: 0.6,
   },
 });

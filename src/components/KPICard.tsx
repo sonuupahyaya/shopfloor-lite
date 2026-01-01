@@ -16,8 +16,8 @@ interface KPICardProps {
 }
 
 export function KPICard({ title, value, subtitle, icon, color, trend }: KPICardProps) {
-  const getTrendIcon = () => {
-    if (!trend) return null;
+  const getTrendIcon = (): string => {
+    if (!trend) return 'remove';
     switch (trend.direction) {
       case 'up':
         return 'arrow-up';
