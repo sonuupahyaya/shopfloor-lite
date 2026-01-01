@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "ShopFloor Lite",
+    "slug": "shopfloor-lite",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "shopfloor",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "backgroundColor": "#1E3A5F"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.shopfloor.lite"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#1E3A5F"
+      },
+      "package": "com.shopfloor.lite",
+      "permissions": ["android.permission.CAMERA", "android.permission.READ_EXTERNAL_STORAGE"]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow ShopFloor Lite to access your photos for documenting downtime events.",
+          "cameraPermission": "Allow ShopFloor Lite to use the camera for documenting downtime events."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
