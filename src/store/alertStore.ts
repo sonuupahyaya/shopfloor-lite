@@ -5,7 +5,7 @@ import { getAlerts, createAlert as dbCreateAlert, updateAlert as dbUpdateAlert }
 import { useAuthStore } from './authStore';
 import { useMachineStore } from './machineStore';
 
-const TENANT_ID = 'tenant_demo';
+const TENANT_ID = 'sonu_kumar';
 
 interface AlertState {
   alerts: Alert[];

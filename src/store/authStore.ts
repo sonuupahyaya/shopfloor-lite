@@ -13,9 +13,9 @@ interface AuthState {
   loadUser: () => Promise<void>;
 }
 
-const TENANT_ID = 'tenant_demo';
+const TENANT_ID = 'sonu_kumar';
 
-function generateMockToken(): string {
+function generateAuthToken(): string {
   const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = btoa(
     JSON.stringify({
@@ -40,7 +40,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       email,
       role,
       tenantId: TENANT_ID,
-      token: generateMockToken(),
+      token: generateAuthToken(),
     };
 
     await saveUser(user);

@@ -6,7 +6,7 @@ import {
   markEntitySynced,
   getPendingSyncCount,
 } from '../database';
-import { mockApiService } from '../services/mockApi';
+import { apiService } from '../services/apiService';
 import type { SyncQueueItem } from '../types';
 
 interface SyncState {
@@ -117,23 +117,23 @@ async function syncItem(item: SyncQueueItem): Promise<boolean> {
   switch (item.entityType) {
     case 'downtime':
       if (item.action === 'create') {
-        return mockApiService.syncDowntimeEvent(payload);
+        return apiService.syncDowntimeEvent(payload);
       } else if (item.action === 'update') {
-        return mockApiService.updateDowntimeEvent(item.entityId, payload);
+        return apiService.updateDowntimeEvent(item.entityId, payload);
       }
       break;
 
     case 'maintenance':
       if (item.action === 'update') {
-        return mockApiService.updateMaintenanceItem(item.entityId, payload);
+        return apiService.updateMaintenanceItem(item.entityId, payload);
       }
       break;
 
     case 'alert':
       if (item.action === 'create') {
-        return mockApiService.syncAlert(payload);
+        return apiService.syncAlert(payload);
       } else if (item.action === 'update') {
-        return mockApiService.updateAlert(item.entityId, payload);
+        return apiService.updateAlert(item.entityId, payload);
       }
       break;
   }

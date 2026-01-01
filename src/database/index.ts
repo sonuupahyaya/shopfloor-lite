@@ -54,7 +54,7 @@ async function runMigrations(): Promise<void> {
 
   if (!hasTenantId) {
     console.log('[Database] Running migration: adding tenant_id to alerts');
-    await db.execAsync(`ALTER TABLE alerts ADD COLUMN tenant_id TEXT DEFAULT 'tenant_demo'`);
+    await db.execAsync(`ALTER TABLE alerts ADD COLUMN tenant_id TEXT DEFAULT 'sonu_kumar'`);
   }
 }
 

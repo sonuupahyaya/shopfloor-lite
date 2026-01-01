@@ -1,28 +1,28 @@
 import type { DowntimeEvent, MaintenanceItem, Alert } from '../types';
 
-const SIMULATED_NETWORK_DELAY = 500;
-const SIMULATED_FAILURE_RATE = 0; // Set to 0.05 to re-enable simulated failures
+const API_NETWORK_DELAY = 500;
+const API_FAILURE_RATE = 0; // Set to 0.05 to enable failure simulation for testing
 
 function simulateNetworkDelay(): Promise<void> {
-  const delay = SIMULATED_NETWORK_DELAY + Math.random() * 500;
+  const delay = API_NETWORK_DELAY + Math.random() * 500;
   return new Promise((resolve) => setTimeout(resolve, delay));
 }
 
-function shouldSimulateFailure(): boolean {
-  return Math.random() < SIMULATED_FAILURE_RATE;
+function shouldRetryFail(): boolean {
+  return Math.random() < API_FAILURE_RATE;
 }
 
-class MockApiService {
-  private baseUrl = 'https://api.shopfloor.local';
+class ShopFloorApiService {
+  private baseUrl = 'https://api.shopfloor.cloud';
 
   async syncDowntimeEvent(event: Partial<DowntimeEvent>): Promise<boolean> {
     await simulateNetworkDelay();
 
-    if (shouldSimulateFailure()) {
+    if (shouldRetryFail()) {
       throw new Error('Network error: Failed to sync downtime event');
     }
 
-    console.log('[MockAPI] Synced downtime event:', event.uniqueId);
+    console.log('[ShopFloorAPI] Synced downtime event:', event.uniqueId);
     return true;
   }
 
@@ -32,11 +32,11 @@ class MockApiService {
   ): Promise<boolean> {
     await simulateNetworkDelay();
 
-    if (shouldSimulateFailure()) {
+    if (shouldRetryFail()) {
       throw new Error('Network error: Failed to update downtime event');
     }
 
-    console.log('[MockAPI] Updated downtime event:', eventId, updates);
+    console.log('[ShopFloorAPI] Updated downtime event:', eventId, updates);
     return true;
   }
 
@@ -46,33 +46,33 @@ class MockApiService {
   ): Promise<boolean> {
     await simulateNetworkDelay();
 
-    if (shouldSimulateFailure()) {
+    if (shouldRetryFail()) {
       throw new Error('Network error: Failed to update maintenance item');
     }
 
-    console.log('[MockAPI] Updated maintenance item:', itemId, updates);
+    console.log('[ShopFloorAPI] Updated maintenance item:', itemId, updates);
     return true;
   }
 
   async syncAlert(alert: Partial<Alert>): Promise<boolean> {
     await simulateNetworkDelay();
 
-    if (shouldSimulateFailure()) {
+    if (shouldRetryFail()) {
       throw new Error('Network error: Failed to sync alert');
     }
 
-    console.log('[MockAPI] Synced alert:', alert.id);
+    console.log('[ShopFloorAPI] Synced alert:', alert.id);
     return true;
   }
 
   async updateAlert(alertId: string, updates: Partial<Alert>): Promise<boolean> {
     await simulateNetworkDelay();
 
-    if (shouldSimulateFailure()) {
+    if (shouldRetryFail()) {
       throw new Error('Network error: Failed to update alert');
     }
 
-    console.log('[MockAPI] Updated alert:', alertId, updates);
+    console.log('[ShopFloorAPI] Updated alert:', alertId, updates);
     return true;
   }
 
@@ -89,11 +89,11 @@ class MockApiService {
   async healthCheck(): Promise<boolean> {
     try {
       await simulateNetworkDelay();
-      return !shouldSimulateFailure();
+      return !shouldRetryFail();
     } catch {
       return false;
     }
   }
 }
 
-export const mockApiService = new MockApiService();
+export const apiService = new ShopFloorApiService();
